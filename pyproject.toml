@@ -43,8 +43,8 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Jmiceli17/AttitudePrototypes"
-Documentation = "https://github.com/Jmiceli17/Prototypes/tree/main/spacecraftAttitudeDynamicsCapstone/Documentation"
+Homepage = "https://github.com/Jmiceli17/spacecraft_dynamics"
+Documentation = "https://github.com/Jmiceli17/spacecraft_dynamics/tree/main/docs"
 
 [project.scripts]
 run-mission = "spacecraft_dynamics.examples.MissionSimulation:main"
