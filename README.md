@@ -23,7 +23,7 @@ This package is not on PyPI but you can install it directly from the repository:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Jmiceli17/AttitudePrototypes.git
+git clone https://github.com/Jmiceli17/spacecraft_dynamics.git
 cd AttitudePrototypes/spacecraft_dynamics
 
 # Option 1: Install directly
@@ -38,7 +38,7 @@ pip install -e .
 
 
 ## Documentation
-
+See https://github.com/Jmiceli17/spacecraft_dynamics/tree/main/docs for this package's current documentation.
 
 ## Examples
 See the `examples/` directory for usage examples:
@@ -58,8 +58,8 @@ If running in WSL2, you will have to install and start [XLaunch/VcXsrv](https://
 For development, clone the repository and create a conda environment:
 
 ```bash
-git clone https://github.com/Jmiceli17/AttitudePrototypes.git
-cd AttitudePrototypes/spacecraft_dynamics
+git clone https://github.com/Jmiceli17/spacecraft_dynamics.git
+cd spacecraft_dynamics
 conda env create -f environment.yml
 conda activate sc-dyn
 pip install -e .
