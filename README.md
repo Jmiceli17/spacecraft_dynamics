@@ -24,7 +24,7 @@ This package is not on PyPI but you can install it directly from the repository:
 ```bash
 # Clone the repository
 git clone https://github.com/Jmiceli17/spacecraft_dynamics.git
-cd AttitudePrototypes/spacecraft_dynamics
+cd spacecraft_dynamics
 
 # Option 1: Install directly
 pip install .
@@ -47,7 +47,7 @@ See the `examples/` directory for usage examples:
 - Orbital scenarios
 ```bash
 # Example usage
-cd AttitudePrototypes/spacecraft_dynamics/examples
+cd spacecraft_dynamics/examples
 python MissionSimulation.py
 ```
 #### NOTE
