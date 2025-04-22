@@ -1,5 +1,9 @@
 """
-Example script creating custom guidance and control functions
+Example scenario demonstrating how to define reference attitude functions and a control function to track those references
+
+This scenario does not use the spacecraft class or actuator models (though it does define the dynamics
+using the "inertia" of a satellite). It propagates the equations of motion of a spacecraft assuming 
+perfect ability to generate the required command torque.
 """
 import numpy as np
 
@@ -14,7 +18,17 @@ import spacecraft_dynamics.analysis.plots as plots
 
 
 def ReferenceAttitude(t:float, f:float = 0.03) -> np.array:
+    """
+    Define the reference attitude that we want the spacecraft to 'track'
+    as a sinusoidal function of time
 
+    Args:
+        t (float): Simulation time [sec]
+        f (float): Frequency of the sinusoidal function
+
+    Returns:
+        3x3 DCM [RN], the 'inertial to reference' attitude DCM
+    """
     sigma_RN = MRP(0.1 * np.sin(f * t), 
                    0.2 * np.cos(f * t), 
                    -0.3 * np.sin(2.0 * f * t))
@@ -23,6 +37,19 @@ def ReferenceAttitude(t:float, f:float = 0.03) -> np.array:
     return dcm_R_N
 
 def ReferenceAngularVelocity(t:float, dt:float=0.0001) -> np.array:
+    """
+    Define the reference angular velocity that we want the spacecraft to 'track'
+    by numerically differentiating the reference attitude
+
+    Args:
+        t (float): Simulation time [sec]
+        dt (float): The time step to use for numerical differentiation [sec]
+
+    Returns:
+        3x1 N_omega_RN, the angular velocity of the reference frame wrt the inertial (expressed
+            in inertial frame components) [rad/s]
+    """
+
     # Approximate [NRc_dot] numerically by applying a small time step and evaluating the change in [NRc]
 
     dcm_R_N_0 = ReferenceAttitude(t - dt)
@@ -50,7 +77,18 @@ def ReferenceAngularVelocity(t:float, dt:float=0.0001) -> np.array:
     return N_omega_RN
 
 def ReferenceAngularAcceleration(t:float, dt:float=0.0001) -> np.array:
-    '''Function for approximating N_omega_RN_dot'''
+    """
+    Define the reference angular accleration that we want the spacecraft to 'track'
+    by numerically differentiating the reference angular velocity
+
+    Args:
+        t (float): Simulation time [sec]
+        dt (float): The time step to use for numerical differentiation [sec]
+
+    Returns:
+        3x1 N_omega_RN_dot, the angular acceleration of the reference frame wrt the inertial (expressed
+            in body frame components) [rad/s^2]
+    """
 
     N_omega_RN_0 = ReferenceAngularVelocity(t-dt)
     N_omega_RN_1 = ReferenceAngularVelocity(t)
@@ -59,12 +97,28 @@ def ReferenceAngularAcceleration(t:float, dt:float=0.0001) -> np.array:
 
     return N_omega_RN_dot
 
-def ControlFunction(t, state, gains=(np.eye(3),np.eye(3)), inertia=np.eye(3)):
+def ControlFunction(t:float, 
+                    state:np.array, 
+                    gains:tuple=(np.eye(3),np.eye(3)), 
+                    inertia:np.array=np.eye(3))->tuple[np.array, Mode, np.array, np.array]:
     """
-    Attitude reference given as a function of time and angular velocity reference is estimated numerically
+    Define a PD-like control law foir generating the torque required to track a reference attitude
     
     This function implements a slightly more complicated control law that uses the gyroscopic terms of the reference
     angular velocity
+
+    Args:
+        t (float): Simulation time [sec]
+        state (ndarray): 3x2 state array where first 3 elements correspond to sigma_BN, second 3 elements 
+            correspond to B_omega_BN
+        gains (tuple): derivative and proportional gains to use for PD control function
+        inertia (ndarray): The spacecraft's inertia (expressed in body frame components) [kg*m^2]
+    Returns:
+        Tuple of 
+            - required control torque (in body frame)
+            - the pointing "mode" at this time
+            - The attitude tracking error (simga_BR)
+            - The angular velocity tracking error (B_omega_BR) [rad/s]
     """
     pointing_mode = Mode.INVALID
 
@@ -80,9 +134,6 @@ def ControlFunction(t, state, gains=(np.eye(3),np.eye(3)), inertia=np.eye(3)):
 
     # Use the current attitude to determine the attitude and ang vel tracking error
     sigma_BR, B_omega_BR = CalculateAttitudeError(sigma_BN, B_omega_BN, dcm_R_N, N_omega_RN)
-
-    # if sigma_BR.norm() > 1.0:
-    #     sigma_BR = sigma_BR.convert_to_shadow_set()
 
     # Convert ang vel and acceleration reference to body frame
     dcm_B_N = RBK.MRP2C(sigma_BN)

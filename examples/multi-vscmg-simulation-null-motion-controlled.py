@@ -1,3 +1,12 @@
+"""
+Example scenario demonstrating how to create a spacecraft object with multiple VSCMGs and simulate it
+
+This scenario defines a reference attitude as the initial attitude and control law for generating the control 
+torque required to hold that attitude
+
+This scenario also uses the VSCMG null space to attempt to drive the VSCMGs to a desired state
+"""
+
 import numpy as np
 import math
 
@@ -22,7 +31,15 @@ import spacecraft_dynamics.analysis.plots as plots
 def ReferenceAttitude(t:float, f:float = 0.03) -> np.array:
     """
     In this scenario, the reference attitude is held at the initial attitude
+    
+    Args:
+        t (float): Simulation time [sec]
+        f (float): Frequency of the sinusoidal function
+
+    Returns:
+        3x3 DCM [RN], the 'inertial to reference' attitude DCM
     """
+
     sigma_RN =  MRP(0.1, 0.2, 0.3)
     dcm_R_N = RBK.MRP2C(sigma_RN.as_array())
 
@@ -31,6 +48,14 @@ def ReferenceAttitude(t:float, f:float = 0.03) -> np.array:
 def ReferenceAngularVelocity(t:float, dt:float=0.0001) -> np.array:
     """
     Approximate [NRc_dot] numerically by applying a small time step and evaluating the change in [NRc]
+
+    Args:
+        t (float): Simulation time [sec]
+        dt (float): The time step to use for numerical differentiation [sec]
+
+    Returns:
+        3x1 N_omega_RN, the angular velocity of the reference frame wrt the inertial (expressed
+            in inertial frame components) [rad/s]
     """
 
     dcm_R_N_0 = ReferenceAttitude(t - dt)
@@ -59,7 +84,17 @@ def ReferenceAngularVelocity(t:float, dt:float=0.0001) -> np.array:
 
 def ReferenceAngularAcceleration(t:float, dt:float=0.0001) -> np.array:
     """
-    Function for approximating N_omega_RN_dot
+    Function for approximating N_omega_RN_dot, the reference angular accleration 
+    that we want the spacecraft to 'track'
+     Approximate this by numerically differentiating the reference angular velocity
+
+    Args:
+        t (float): Simulation time [sec]
+        dt (float): The time step to use for numerical differentiation [sec]
+
+    Returns:
+        3x1 N_omega_RN_dot, the angular acceleration of the reference frame wrt the inertial (expressed
+            in body frame components) [rad/s^2]
     """
 
     N_omega_RN_0 = ReferenceAngularVelocity(t-dt)
@@ -71,10 +106,18 @@ def ReferenceAngularAcceleration(t:float, dt:float=0.0001) -> np.array:
 
 def ControlFunction(t, spacecraft:Spacecraft):
     """
+    Define a PD-like control law foir generating the torque required to track a reference attitude
     Attitude reference given as a function of time and angular velocity reference is estimated numerically
-    
-    This function implements a slightly more complicated control law that uses the gyroscopic terms of the reference
-    angular velocity
+
+    Args:
+        t (float): Simulation time [sec]
+
+    Returns:
+        Tuple of 
+            - required control torque (in body frame)
+            - the pointing "mode" at this time
+            - The attitude tracking error (simga_BR)
+            - The angular velocity tracking error (B_omega_BR) [rad/s]
     """
     pointing_mode = Mode.INVALID
 

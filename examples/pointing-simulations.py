@@ -1,5 +1,9 @@
 """
-Simulation demonstrating the different types of pointing control for 400 seconds 
+Simulation scenarios demonstrating the different types of pointing control for 400 seconds 
+
+This scenario does not use the spacecraft class or actuator models. It just propagates
+the equations of motion of a spacecraft assuming perfect ability to generate the required 
+command torque.
 
 Each simulation assumes that the spacecraft attempts to point immediately
 Gains are calculate using the provided requirements of a maximum 120s decay

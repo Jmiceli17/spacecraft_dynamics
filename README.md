@@ -48,7 +48,7 @@ See the `examples/` directory for usage examples:
 ```bash
 # Example usage
 cd AttitudePrototypes/spacecraft_dynamics/examples
-python MissionSimulation.py
+python mission-simulation.py
 ```
 #### NOTE
 If running in WSL2, you will have to install and start [XLaunch/VcXsrv](https://sourceforge.net/projects/vcxsrv/) (or some other X-server) in order for the plots to display.

@@ -1,3 +1,10 @@
+"""
+Example scenario demonstrating how to create a spacecraft object with a single VSCMG and simulate it
+
+This scenario does not use any control law or track any reference attitude, it simply propagates 
+the dynamics of the system
+"""
+
 import numpy as np
 import math
 
