@@ -47,7 +47,7 @@ See the `examples/` directory for usage examples:
 - Orbital scenarios
 ```bash
 # Example usage
-cd AttitudePrototypes/spacecraft_dynamics/examples
+cd spacecraft_dynamics/examples
 python mission-simulation.py
 ```
 #### NOTE
