@@ -17,7 +17,7 @@ import numpy as np
 
 
 class BaseSpacecraftDynamics(ABC):
-    """Abstract base class for spacecraft dynamics"""
+    """Abstract base class for spacecraft attitude dynamics"""
     
     def __init__(self, spacecraft: Spacecraft):
         """Initialize the dynamics model

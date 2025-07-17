@@ -90,7 +90,7 @@ class SpacecraftState:
         actuator_states (list): List of actuator states (VSCMG or Reaction Wheel)
     """
     
-    def __init__(self, sigma_BN=None, B_omega_BN=None, actuator_states:list[ActuatorState]=[]):
+    def __init__(self, sigma_BN=None, B_omega_BN=None, actuator_states:list[ActuatorState]=[], N_position=None, N_velocity=None):
         """
         Initialize the spacecraft state with N actuators.
         
@@ -100,6 +100,8 @@ class SpacecraftState:
             B_omega_BN (list/ndarray, optional): Angular velocity wrt the inertial frame expressed in body frame [rad/s]
                                            Defaults to [0, 0, 0].
             actuator_states (list): List of actuator states (VSCMG or Reaction Wheel)
+            N_position (list/ndarray, optional): Inertial position of the spacecraft [m]
+            N_velocity (list/ndarray, optional): Inertial velocity of the spacecraft [m/s]
         """
         if isinstance(sigma_BN, MRP):
             self.sigma_BN = sigma_BN
@@ -110,13 +112,17 @@ class SpacecraftState:
 
         self.B_omega_BN = np.array([0,0,0]) if B_omega_BN is None else B_omega_BN
         self.actuator_states = actuator_states
+        self.N_position = N_position
+        self.N_velocity = N_velocity
     
     def __str__(self):
         """String representation of the spacecraft state."""
         base_str = (f"SpacecraftState:\n"
-                   f"  sigma_BN: {self.sigma_BN.as_array()}\n"
-                   f"  B_omega_BN: {self.B_omega_BN}\n"
-                   f"  Actuator States:\n")
+                    f"  N_position: {self.N_position}\n"
+                    f"  N_velocity: {self.N_velocity}\n"
+                    f"  sigma_BN: {self.sigma_BN.as_array()}\n"
+                    f"  B_omega_BN: {self.B_omega_BN}\n"
+                    f"  Actuator States:\n")
         
         for i, state in enumerate(self.actuator_states):
             base_str += f"    Actuator {i}:\n      {str(state)}"
@@ -132,7 +138,9 @@ class SpacecraftState:
         self.actuator_states.append(state)
 
     def to_array(self, format="new"):
-        """Convert state to array format"""
+        """Convert state to array format
+        # TODO: add position and velocity
+        """
         state_array = np.concatenate((self.sigma_BN.as_array(), self.B_omega_BN))
 
         if self.actuator_states:
@@ -156,7 +164,7 @@ class SpacecraftState:
     def from_array(cls, array, spacecraft=None, format="new"):
         """
         Create state from array using spacecraft configuration
-        
+        # TODO: add position and velocity
         Args:
             array: The state array
             spacecraft: The spacecraft object that defines the configuration
