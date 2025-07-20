@@ -12,7 +12,7 @@ class FormationDynamics():
         self.orbit = chiefOrbit
         self.deputy_states = H_deputy_states
 
-    def compute_state_derivatives(self, t: float, state_array: np.ndarray) -> np.ndarray:
+    def compute_state_derivatives(self, t: float, state_array: np.ndarray, useLinearizedEoms:bool=False) -> np.ndarray:
         """Compute the state derivatives for the Keplerian dynamics model"""
         
         # Extract states using helper functions
@@ -30,14 +30,22 @@ class FormationDynamics():
         # Deputy derivatives
         for i in range(len(self.deputy_states)):
             H_rho_dep, H_rhop_dep = self._get_deputy_state(state_array, i)
-
-            # Calculate deputy derivatives (implement these methods)
             H_rho_dep_dot = H_rhop_dep
-            H_rhop_dep_dot = self._compute_deputy_accelerations_at_time(t,
-                                                                        H_rho_dep, 
-                                                                        H_rhop_dep,
-                                                                        N_position_chief,
-                                                                        N_velocity_chief)
+
+            # Calculate deputy relative motion derivatives
+            if useLinearizedEoms:
+                H_rhop_dep_dot = self._compute_deputy_linearized_accelerations_at_time(t,
+                                                                                    H_rho_dep, 
+                                                                                    H_rhop_dep,
+                                                                                    N_position_chief,
+                                                                                    N_velocity_chief)
+
+            else:
+                H_rhop_dep_dot = self._compute_deputy_accelerations_at_time(t,
+                                                                            H_rho_dep, 
+                                                                            H_rhop_dep,
+                                                                            N_position_chief,
+                                                                            N_velocity_chief)
 
             all_derivatives.extend([H_rho_dep_dot, H_rhop_dep_dot])
 
@@ -61,6 +69,19 @@ class FormationDynamics():
         state_array[start_idx + 3:start_idx + 6] = H_rhop
 
     def _compute_deputy_accelerations_at_time(self, t, H_rho_dep, H_rhop_dep, N_pos_chief, N_vel_chief)-> np.ndarray:
+        """
+        The relative equations of motion for a deputy relative to a chief
+        NOTE: These are the "exact" relative equations of motion (not the linearized set)
+
+        Args:
+            t:
+            H_rho_dep:
+            H_rhop_dep:
+            N_pos_chief:
+            N_vel_chief:
+
+        Returns: Relative state acceleration vector of xDdot, yDdot, and zDdot
+        """
         x = H_rho_dep[0]
         y = H_rho_dep[1]
         z = H_rho_dep[2]
@@ -98,11 +119,43 @@ class FormationDynamics():
         return rhop_dot
     
 
+    def _compute_deputy_linearized_accelerations_at_time(self,  t, H_rho_dep, H_rhop_dep, N_pos_chief, N_vel_chief):
+
+
+        x = H_rho_dep[0]
+        y = H_rho_dep[1]
+        z = H_rho_dep[2]
+
+        xDot = H_rhop_dep[0]
+        yDot = H_rhop_dep[1]
+        zDot = H_rhop_dep[2]
+
+        # Magnitude of position
+        rChief = np.linalg.norm(N_pos_chief)
+
+        dcm_HN = self.orbit.hill_frame_at_time(t)
+        # Get the r-direction of the Hill frame expressed in inertial coordinates, this is the top row of the [HN] DCM
+        N_ohat_r = dcm_HN[0]
+        # Get the radial component of velocity rcDot
+        rcDot = np.dot(N_vel_chief, N_ohat_r)
+
+        true_anom_rate = self.orbit.true_anomaly_rate_at_time(t)
+
+        p = self.orbit.semi_latus_rectum
+        
+        # Compute state accelerations
+        xDdot = 2.0 * true_anom_rate * (yDot - (y * (rcDot / rChief))) + (x * true_anom_rate * true_anom_rate) * (1.0 + (2.0 * (rChief / p)))
+        yDdot =  -2.0 * true_anom_rate * (xDot - (x * (rcDot / rChief))) + (y * true_anom_rate * true_anom_rate) * (1.0 - (rChief / p))
+        zDdot = -rChief / p * true_anom_rate * true_anom_rate * z
+        rhop_dot = np.array([xDdot, yDdot, zDdot])
+        return rhop_dot
+
     def simulate(self,
                 t_init: float,
                 t_max: float,
                 t_step: float = 0.1,
-                disturbance_acceleration: callable = None) -> dict:
+                disturbance_acceleration: callable = None,
+                useLinearizedEoms:bool=False) -> dict:
         """
         Simulate the formation dynamics using RK4 integration.
 
@@ -111,7 +164,8 @@ class FormationDynamics():
             t_max (float): End time [s]
             t_step (float): Time step [s]
             disturbance_acceleration (callable): Optional disturbance function f(t, state)
-
+            useLinearizedEoms (bool): Optional flag that if `true` indicates that the linearized relative EOMs
+            should be used, otherwise the exact relative EOMs are used
         Returns:
             dict: Dictionary mapping variable names to their time histories
         """
@@ -140,11 +194,11 @@ class FormationDynamics():
 
         # 4. Integration loop
         while t < t_max:
-            # RK4 steps
-            k1 = t_step * self.compute_state_derivatives(t, current_state)
-            k2 = t_step * self.compute_state_derivatives(t + 0.5 * t_step, current_state + 0.5 * k1)
-            k3 = t_step * self.compute_state_derivatives(t + 0.5 * t_step, current_state + 0.5 * k2)
-            k4 = t_step * self.compute_state_derivatives(t + t_step, current_state + k3)
+
+            k1 = t_step * self.compute_state_derivatives(t, current_state, useLinearizedEoms)
+            k2 = t_step * self.compute_state_derivatives(t + 0.5 * t_step, current_state + 0.5 * k1, useLinearizedEoms)
+            k3 = t_step * self.compute_state_derivatives(t + 0.5 * t_step, current_state + 0.5 * k2, useLinearizedEoms)
+            k4 = t_step * self.compute_state_derivatives(t + t_step, current_state + k3, useLinearizedEoms)
 
             next_state = current_state + (k1 + 2 * k2 + 2 * k3 + k4) / 6.0
 

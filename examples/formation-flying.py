@@ -35,14 +35,17 @@ if __name__== "__main__":
     print(f"initial_vd_N = [{N_velocity_dep[0]}, {N_velocity_dep[1]}, {N_velocity_dep[2]}] # km/s")
 
     tInit = chief_orbit.time_of_epoch
+    useLinearizedEoms = True
     tMax = 2000
     tStep = 0.01
-    solution = formationDynamics.simulate(t_init=tInit, t_max=tMax, t_step=tStep)
+    solution = formationDynamics.simulate(t_init=tInit, t_max=tMax, t_step=tStep, useLinearizedEoms=useLinearizedEoms)
 
     # Print chief's final position and velocity
-    print(f"Simulation end time: {solution['time'][-1]}")
-    print("Final chief position:", solution["position"][-1])
-    print("Final chief velocity:", solution["velocity"][-1])
+    print(f"======== Simulation complete ========")
+    print(f"Used linearized equations of motion? {useLinearizedEoms}")
+    print(f"End time: {solution['time'][-1]}")
+    print(f"Final chief position:", solution["position"][-1])
+    print(f"Final chief velocity:", solution["velocity"][-1])
 
     # Print each deputy's final state
     num_deputies = len(deputyStates)
@@ -50,8 +53,8 @@ if __name__== "__main__":
         H_rho_dep_final = solution[f'deputy_{i}_rho'][-1]
         H_rhop_dep_final = solution[f'deputy_{i}_rhop'][-1]
         print(f"Deputy relative state converted in Hill frame:")
-        print(f"  Final deputy {i} rho: {H_rho_dep_final / 1000}")
-        print(f"  Final deputy {i} rhop: {H_rhop_dep_final / 1000}")
+        print(f"  Final deputy {i} rho: {H_rho_dep_final / 1000} [km; Hill]")
+        print(f"  Final deputy {i} rhop: {H_rhop_dep_final / 1000} [km/s; Hill]")
 
         N_pos_dep_final, N_vel_dep_final = chief_orbit.deputy_inertial_position_and_velocity_at_time(
                                                     H_rho_dep_final, 
@@ -64,5 +67,5 @@ if __name__== "__main__":
     deputySolution = deputyDynamics.simulate(t_init=tInit,t_max=tMax, t_step=tStep)
     # Print chief's final position and velocity (in this orbit, "chief" actually refers to the deputy)
     print(f"Deputy inertial simulation end time: {deputySolution['time'][-1]}")
-    print(f"Final deputy position: {deputySolution['position'][-1] / 1000}" )
-    print(f"Final deputy velocity: {deputySolution['velocity'][-1] / 1000}" )
+    print(f"Final deputy inertial position: {deputySolution['position'][-1] / 1000}" )
+    print(f"Final deputy inertial velocity: {deputySolution['velocity'][-1] / 1000}" )
