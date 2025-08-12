@@ -383,35 +383,67 @@ class Orbit:
             sma = 0  # Parabolic orbit
         
         # Inclination
-        if h[2] == 0.0:
-            inc = 0.0
-        else:
-            inc = np.arccos(h[2] / h_mag)
-        
+        # if h[2] == 0.0:
+        #     inc = 0.0
+        # else:
+        #     inc = np.arccos(h[2] / h_mag)
+        cos_inc = np.clip(h[2] / h_mag, -1.0, 1.0)
+        inc = np.arccos(cos_inc)
+
         # RAAN
-        if n[0] == 0.0:
+        # if n[0] == 0.0:
+        #     raan = 0.0
+        # else:
+        #     raan = np.arccos(n[0] / n_mag)
+        # if n[1] < 0:
+        #      raan = 2 * np.pi - raan
+        if n_mag < 1e-12:
+            # Near equatorial orbit
             raan = 0.0
         else:
-            raan = np.arccos(n[0] / n_mag)
-        if n[1] < 0:
-            raan = 2 * np.pi - raan
+            cos_raan = np.clip(n[0] / n_mag, -1.0, 1.0)
+            raan = np.arccos(cos_raan)
+            if n[1] < 0:
+                raan = 2 * np.pi - raan
         
         # Argument of periapsis
-        if np.dot(n, e_vec) == 0.0:
+        # if np.dot(n, e_vec) == 0.0:
+        #     argp = 0.0
+        # else:
+        #     argp = np.arccos(np.dot(n, e_vec) / (n_mag * ecc))
+        # if e_vec[2] < 0.0:
+        #     argp = 2 * np.pi - argp
+        if n_mag < 1e-12 or ecc < 1e-12:
+            # Near equatorial or circular orbit
             argp = 0.0
         else:
-            argp = np.arccos(np.dot(n, e_vec) / (n_mag * ecc))
-        if e_vec[2] < 0.0:
-            argp = 2 * np.pi - argp
-        
+            cos_argp = np.clip(np.dot(n, e_vec) / (n_mag * ecc), -1.0, 1.0)
+            argp = np.arccos(cos_argp)
+            if e_vec[2] < 0:
+                argp = 2 * np.pi - argp
+
         # True anomaly
-        if np.dot(e_vec, position) == 0.0:
+        # print(f"np.dot(e_vec, position): {np.dot(e_vec, position)}")
+        # if np.dot(e_vec, position) == 0.0:
+        #     nu = 0.0
+        # else:
+        #     print(f"e_vec: {e_vec}")
+        #     print(f"position: {position}")
+        #     print(f"ecc: {ecc}")
+        #     print(f"r_mag: {r_mag}")
+        #     print(f"np.dot(e_vec, position) / (ecc * r_mag): {np.dot(e_vec, position) / (ecc * r_mag)}")
+        #     nu = np.arccos(np.dot(e_vec, position) / (ecc * r_mag))
+        # if np.dot(position, velocity) < 0:
+        #     nu = 2 * np.pi - nu
+        if ecc < 1e-12:
+            # Circular orbit
             nu = 0.0
         else:
-            nu = np.arccos(np.dot(e_vec, position) / (ecc * r_mag))
-        if np.dot(position, velocity) < 0:
-            nu = 2 * np.pi - nu
-        
+            cos_nu = np.clip(np.dot(e_vec, position) / (ecc * r_mag), -1.0, 1.0)
+            nu = np.arccos(cos_nu)
+            if np.dot(position, velocity) < 0:
+                nu = 2 * np.pi - nu
+
         # Calculate eccentric anomaly
         if ecc < 1:
             sqrt_term = np.sqrt((1 - ecc) / (1 + ecc))

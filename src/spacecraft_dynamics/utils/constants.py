@@ -14,6 +14,6 @@ R_MARS = 3396.19*1000
 # # Orbit rate of GMO spacecraft [rad/s]
 # ORBIT_RATE_GMO = 0.0000709003
 
-# Standard gravitational param for Earth [m^3/s^2]
-# MU_EARTH = 398600e9
-MU_EARTH = 3.986004418e14
+# Standard gravitational param for Earth 
+MU_EARTH_KM = 3.986e5 # [km^3/s^2]
+MU_EARTH_M = 3.986004418e14 # [m^3/s^2]
