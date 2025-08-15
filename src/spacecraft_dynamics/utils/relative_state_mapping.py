@@ -1,9 +1,12 @@
 import numpy as np
 from spacecraft_dynamics.utils import constants
-from spacecraft_dynamics.orbit import Orbit
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from spacecraft_dynamics.orbit import Orbit
 
 
-def mapping_oe_differences_to_relative_cartesian_state(chiefOrbit:Orbit=None, 
+def mapping_oe_differences_to_relative_cartesian_state(chiefOrbit:'Orbit'=None, 
                                             trueAnomaly:float=0.0, 
                                             semiMajorAxis:float=None, 
                                             trueLatitude:float=None,
@@ -137,7 +140,7 @@ def mapping_oe_differences_to_relative_cartesian_state(chiefOrbit:Orbit=None,
     return A
 
 
-def mapping_cartesian_state_to_oe_differences(chiefOrbit:Orbit=None, 
+def mapping_cartesian_state_to_oe_differences(chiefOrbit:'Orbit'=None, 
                                             trueAnomaly:float=0.0, 
                                             semiMajorAxis:float=None, 
                                             trueLatitude:float=None,

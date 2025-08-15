@@ -27,7 +27,7 @@ class Orbit:
                  raan: float,
                  argument_of_periapsis: float,
                  mean_anomaly_at_epoch: float,
-                 time_of_epoch: float,
+                 time_of_epoch: float = 0.0,
                  central_body: str = "Earth"):
         """
         Initialize the Orbit class with classical orbital elements.
@@ -53,7 +53,7 @@ class Orbit:
         
         # Set gravitational parameter based on central body
         if central_body == "Earth":
-            self.mu = constants.MU_EARTH
+            self.mu = constants.MU_EARTH_M
         elif central_body == "Mars":
             self.mu = constants.MU_MARS
         else:
@@ -352,7 +352,7 @@ class Orbit:
         """
         # Set gravitational parameter
         if central_body == "Earth":
-            mu = constants.MU_EARTH
+            mu = constants.MU_EARTH_M
         elif central_body == "Mars":
             mu = constants.MU_MARS
         else:
