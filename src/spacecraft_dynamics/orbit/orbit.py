@@ -285,7 +285,9 @@ class Orbit:
         return dcm_HN
 
 
-    def orbit_angular_velocity_at_time(self, time:float) -> np.ndarray:
+    def orbit_angular_velocity_at_time(self, 
+                                    time:float
+                                    ) -> np.ndarray:
         """
         Compute the angular velocity of the orbit/Hill frame relative to the inertial frame
         at a given time [rad/s]
@@ -312,8 +314,13 @@ class Orbit:
         N_omega_HN = nu_dot * N_hhat_h
         return N_omega_HN
 
-    def deputy_inertial_position_and_velocity_at_time(self, H_rho:np.ndarray, H_rhop:np.ndarray, time:float) -> Tuple[np.ndarray, np.ndarray]:
+    def deputy_inertial_position_and_velocity_at_time(self, 
+                                                    H_rho:np.ndarray, 
+                                                    H_rhop:np.ndarray, 
+                                                    time:float
+                                                    ) -> Tuple[np.ndarray, np.ndarray]:
         """
+        TODO: Rename to deputy_inertial_state_at_time
         Convert relative position of deputy in Hill frame to absolute position
         of deputy in inertial frame at a given time
         """
@@ -328,9 +335,36 @@ class Orbit:
 
         # Deputy intertial position and velocity [m], [m/s]
         N_r_deputy = N_rho_deputy + N_r_chief
-        N_v_deputy = N_rhop_deputy + np.cross(N_omega_HN, N_rho_deputy) + N_v_chief
+        N_v_deputy = N_rhop_deputy + (np.cross(N_omega_HN, N_rho_deputy) + N_v_chief)
         return N_r_deputy, N_v_deputy
 
+
+    def deputy_hill_frame_state_at_time(self,
+                                        N_r:np.ndarray,
+                                        N_rDot:np.ndarray,
+                                        time:float
+                                        ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Convert absolute inertial position and velocity of a deputy into 
+        Hill frame relative coordinates
+        Args:
+            N_r (ndarray): Absolute position of deputy in inertial frame [m]
+            N_rDot (ndarray): Absolute velocity of deputy in inertial frame [m/s]
+            time (float): Time corresponding to the deputy's state [s]
+        Returns: Hill frame position and velocity of the deputy at this time [m], [m/s]
+        """
+        N_r_chief, N_v_chief = self.cartesian_state_at_time(time)
+        dcm_HN = self.hill_frame_at_time(time)
+        N_omega_HN = self.orbit_angular_velocity_at_time(time)
+
+        # Inertial frame relative position and velocity [m], [m/s]
+        N_rho_deputy = N_r - N_r_chief
+        N_rhop_deputy = N_rDot - (np.cross(N_omega_HN, N_rho_deputy) + N_v_chief)
+
+        # Convert to Hill frame
+        H_rho_deputy = dcm_HN @ N_rho_deputy
+        H_rhop_deputy = dcm_HN @ N_rhop_deputy
+        return H_rho_deputy, H_rhop_deputy
 
     @classmethod
     def from_cartesian_state(cls, 
@@ -472,6 +506,61 @@ class Orbit:
                   time_of_epoch=time,
                   central_body=central_body)
     
+
+    @classmethod
+    def from_chief_and_delta_oe(cls, 
+                                chiefOrbit: 'Orbit',
+                                delta_semimajor_axis: float,
+                                delta_eccentricity: float,
+                                delta_inclination: float,
+                                delta_raan: float,
+                                delta_ap: float,
+                                delta_mean_anomaly: float) -> 'Orbit':
+        """
+        Create an Orbit object from the chief orbit and the delta orbit element differences
+        """
+        sma = chiefOrbit.semimajor_axis + delta_semimajor_axis
+        ecc = chiefOrbit.eccentricity + delta_eccentricity
+        inc = chiefOrbit.inclination + delta_inclination
+        raan = chiefOrbit.raan + delta_raan
+        argp = chiefOrbit.argument_of_periapsis + delta_ap
+        M = chiefOrbit.mean_anomaly_at_epoch + delta_mean_anomaly
+        time = chiefOrbit.time_of_epoch
+        central_body = chiefOrbit.central_body
+
+        return cls(semimajor_axis=sma,
+                  eccentricity=ecc,
+                  inclination=inc,
+                  raan=raan,
+                  argument_of_periapsis=argp,
+                  mean_anomaly_at_epoch=M,
+                  time_of_epoch=time,
+                  central_body=central_body)
+
+    @classmethod
+    def delta_oe_from_chief_and_deputy(cls,
+                                        chiefOrbit: 'Orbit',
+                                        deputyOrbit: 'Orbit') -> tuple[float, float, float, float, float, float]:
+        """
+        Given an orbit definition for a chief and a deputy, compute the orbit element difference
+        description of the deputy relative to the chief 
+        NOTE: OE differences here are assumed dOE = deputyOE - chiefOE
+        Args:
+            chiefOrbit (Orbit): The chief orbit 
+            deputyOrbit (Orbit): The deputy orbit
+        Returns:
+            Tuple of orbit element differences (in m, rad) of form 
+            delta_sma, delta_ecc, delta_inc, delta_raan, delta_ap, delta_meanAnom 
+        """
+        deltaSma = deputyOrbit.semimajor_axis - chiefOrbit.semimajor_axis
+        deltaEcc = deputyOrbit.eccentricity - chiefOrbit.eccentricity
+        deltaInc = deputyOrbit.inclination - chiefOrbit.inclination
+        deltaRaan = deputyOrbit.raan - chiefOrbit.raan
+        deltaAp = deputyOrbit.argument_of_periapsis - chiefOrbit.argument_of_periapsis
+        deltaMeanAnom = deputyOrbit.mean_anomaly_at_epoch - chiefOrbit.mean_anomaly_at_epoch
+
+        return (deltaSma, deltaEcc, deltaInc, deltaRaan, deltaAp, deltaMeanAnom)
+
     def __str__(self) -> str:
         """String representation of the orbit."""
         return (f"Orbit(central_body={self.central_body}, "

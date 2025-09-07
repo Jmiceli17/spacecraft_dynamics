@@ -7,8 +7,16 @@ if TYPE_CHECKING:
 
 class FormationDynamics():
     # TODO: Make this a sublcass of dynamics class
+    # TODO: Add ability to create dynamics from orbit definition of deputies
     def __init__(self, chiefOrbit:'Orbit', H_deputy_states:list[np.ndarray]):
-        """Initialize the Keplerian (i.e. unperturbed, two-body) dynamics model"""
+        """
+        Initialize the Keplerian (i.e. unperturbed, two-body) dynamics model
+        This uses the full non-linear equations of relative motion for the deputies. Optionally, 
+        the linearized equations of motion can be used when simulating the dynamics of the formation.
+        Args:
+            chiefOrbit (Orbit): The chief orbit
+            H_deputy_states (list): List of initial Hill frame relative position and velocity vectors each deputy
+        """
         self.orbit = chiefOrbit
         self.deputy_states = H_deputy_states
 
@@ -231,7 +239,14 @@ class FormationDynamics():
 class CwDynamics():
     # TODO: Make this a sublcass of dynamics class
     def __init__(self, chiefOrbit:'Orbit', H_deputy_states:list[np.ndarray]):
-        """Initialize the cicular Keplerian (i.e. unperturbed, two-body) dynamics model"""
+        """
+        Initialize the Keplerian (i.e. unperturbed, two-body) dynamics model
+        This uses the CW equations for modeling the dynamics of the deputies and therefore requires the chief to be in a 
+        nearly circular obit
+        Args:
+            chiefOrbit (Orbit): The chief orbit
+            H_deputy_states (list): List of initial Hill frame relative position and velocity vectors each deputy
+        """
         self.orbit = chiefOrbit
         if self.orbit.eccentricity > 1e-5:
             raise ValueError("Eccentricity must be less than 1e-5 for CW dynamics")
