@@ -6,8 +6,10 @@ Constants used for final project
 MU_MARS = 4.28283e13 
 
 # Radius of mars [m]
-R_MARS = 3396.19*1000
+R_MARS = 3396.19 * 1.0e3
 
+# Radius of earth [m]
+R_EARTH = 6378.0 * 1.0e3
 # # Orbit rate of the LMO spacecraft [rad/s]
 # ORBIT_RATE_LMO = 0.000884797 
 
