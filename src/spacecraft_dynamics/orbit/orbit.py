@@ -21,43 +21,43 @@ class Orbit:
     """
     
     def __init__(self, 
-                 semimajor_axis: float,
+                 semimajorAxis: float,
                  eccentricity: float,
                  inclination: float,
                  raan: float,
-                 argument_of_periapsis: float,
-                 mean_anomaly_at_epoch: float,
-                 time_of_epoch: float = 0.0,
-                 central_body: str = "Earth"):
+                 argumentOfPeriapsis: float,
+                 meanAnomalyAtEpoch: float,
+                 timeOfEpoch: float = 0.0,
+                 centralBody: str = "Earth"):
         """
         Initialize the Orbit class with classical orbital elements.
         
         Args:
-            semimajor_axis (float): Semimajor axis [m]
+            semimajorAxis (float): Semimajor axis [m]
             eccentricity (float): Eccentricity (dimensionless)
             inclination (float): Inclination [rad]
             raan (float): Right ascension of ascending node [rad]
-            argument_of_periapsis (float): Argument of periapsis [rad]
-            mean_anomaly_at_epoch (float): Mean anomaly at epoch [rad]
-            time_of_epoch (float): Time of epoch [s]
-            central_body (str): Central body (default: "Earth")
+            argumentOfPeriapsis (float): Argument of periapsis [rad]
+            meanAnomalyAtEpoch (float): Mean anomaly at epoch [rad]
+            timeOfEpoch (float): Time of epoch [s]
+            centralBody (str): Central body (default: "Earth")
         """
-        self.semimajor_axis = semimajor_axis
+        self.semimajorAxis = semimajorAxis
         self.eccentricity = eccentricity
         self.inclination = inclination
         self.raan = raan
-        self.argument_of_periapsis = argument_of_periapsis
-        self.mean_anomaly_at_epoch = mean_anomaly_at_epoch
-        self.time_of_epoch = time_of_epoch
-        self.central_body = central_body
+        self.argumentOfPeriapsis = argumentOfPeriapsis
+        self.meanAnomalyAtEpoch = meanAnomalyAtEpoch
+        self.timeOfEpoch = timeOfEpoch
+        self.centralBody = centralBody
         
         # Set gravitational parameter based on central body
-        if central_body == "Earth":
+        if centralBody == "Earth":
             self.mu = constants.MU_EARTH_M
-        elif central_body == "Mars":
+        elif centralBody == "Mars":
             self.mu = constants.MU_MARS
         else:
-            raise ValueError(f"Central body '{central_body}' not supported")
+            raise ValueError(f"Central body '{centralBody}' not supported")
         
         # Validate orbital elements
         self._validate_elements()
@@ -73,18 +73,18 @@ class Orbit:
         if self.raan < 0 or self.raan > 2 * np.pi:
             raise ValueError("RAAN must be in range [0, 2π]")
         
-        if self.argument_of_periapsis < 0 or self.argument_of_periapsis > 2 * np.pi:
+        if self.argumentOfPeriapsis < 0 or self.argumentOfPeriapsis > 2 * np.pi:
             raise ValueError("Argument of periapsis must be in range [0, 2π]")
         
-        if self.mean_anomaly_at_epoch < 0 or self.mean_anomaly_at_epoch > 2 * np.pi:
+        if self.meanAnomalyAtEpoch < 0 or self.meanAnomalyAtEpoch > 2 * np.pi:
             raise ValueError("Mean anomaly at epoch must be in range [0, 2π]")
         
         # For elliptical orbits, semimajor axis should be positive
-        if self.eccentricity < 1 and self.semimajor_axis <= 0:
+        if self.eccentricity < 1 and self.semimajorAxis <= 0:
             raise ValueError("Semimajor axis must be positive for elliptical orbits")
         
         # For parabolic orbits, semimajor axis should be infinite (represented as 0)
-        if self.eccentricity == 1 and self.semimajor_axis != 0:
+        if self.eccentricity == 1 and self.semimajorAxis != 0:
             raise ValueError("Semimajor axis should be 0 for parabolic orbits")
     
     @property
@@ -92,22 +92,22 @@ class Orbit:
         """Calculate orbital period [s]."""
         if self.eccentricity >= 1:
             return np.inf  # Parabolic or hyperbolic orbits
-        return 2 * np.pi * np.sqrt(self.semimajor_axis**3 / self.mu)
+        return 2 * np.pi * np.sqrt(self.semimajorAxis**3 / self.mu)
     
     @property
     def mean_motion(self) -> float:
         """Calculate mean motion [rad/s]."""
         if self.eccentricity >= 1:
             return 0  # Parabolic or hyperbolic orbits
-        return np.sqrt(self.mu / self.semimajor_axis**3)
+        return np.sqrt(self.mu / self.semimajorAxis**3)
     
     @property
-    def semi_latus_rectum(self) -> float:
+    def semiLatusRectum(self) -> float:
         """Calculate semi-latus rectum [m]."""
         if self.eccentricity == 1:
             # For parabolic orbits, use the parameter p
-            return self.semimajor_axis  # In this case, semimajor_axis represents p
-        return self.semimajor_axis * (1 - self.eccentricity**2)
+            return self.semimajorAxis  # In this case, semimajorAxis represents p
+        return self.semimajorAxis * (1 - self.eccentricity**2)
     
     def mean_anomaly_at_time(self, time: float) -> float:
         """
@@ -120,8 +120,8 @@ class Orbit:
         if self.eccentricity >= 1:
             raise ValueError("Mean anomaly is not defined for parabolic or hyperbolic orbits")
         
-        dt = time - self.time_of_epoch
-        mean_anomaly = self.mean_anomaly_at_epoch + self.mean_motion * dt
+        dt = time - self.timeOfEpoch
+        mean_anomaly = self.meanAnomalyAtEpoch + self.mean_motion * dt
         
         # Normalize to [0, 2π]
         return mean_anomaly % (2 * np.pi)
@@ -200,7 +200,7 @@ class Orbit:
             raise ValueError("True anomaly rate not implemented for parabolic/hyperbolic orbits")
 
         nu = self.true_anomaly_at_time(time)
-        p = self.semi_latus_rectum
+        p = self.semiLatusRectum
         h = np.sqrt(self.mu * p)
         r = p / (1 + self.eccentricity * np.cos(nu))
         return h / (r ** 2)
@@ -223,15 +223,15 @@ class Orbit:
         nu = self.true_anomaly_at_time(time)
         
         # Calculate radius
-        r = self.semi_latus_rectum / (1 + self.eccentricity * np.cos(nu))
+        r = self.semiLatusRectum / (1 + self.eccentricity * np.cos(nu))
         
         # Position in perifocal frame
         P_r = np.array([r * np.cos(nu), r * np.sin(nu), 0])
         
         # Velocity in perifocal frame
-        h = np.sqrt(self.mu * self.semi_latus_rectum)
-        P_v = np.array([-h * np.sin(nu) / self.semi_latus_rectum, 
-                         h * (self.eccentricity + np.cos(nu)) / self.semi_latus_rectum, 
+        h = np.sqrt(self.mu * self.semiLatusRectum)
+        P_v = np.array([-h * np.sin(nu) / self.semiLatusRectum, 
+                         h * (self.eccentricity + np.cos(nu)) / self.semiLatusRectum, 
                          0])
         
         # Rotation matrices for coordinate transformation
@@ -243,8 +243,8 @@ class Orbit:
                           [0, np.cos(self.inclination), -np.sin(self.inclination)],
                           [0, np.sin(self.inclination), np.cos(self.inclination)]])
         
-        R3_argp = np.array([[np.cos(self.argument_of_periapsis), -np.sin(self.argument_of_periapsis), 0],
-                           [np.sin(self.argument_of_periapsis), np.cos(self.argument_of_periapsis), 0],
+        R3_argp = np.array([[np.cos(self.argumentOfPeriapsis), -np.sin(self.argumentOfPeriapsis), 0],
+                           [np.sin(self.argumentOfPeriapsis), np.cos(self.argumentOfPeriapsis), 0],
                            [0, 0, 1]])
         
         # Combined rotation matrix (perifocal to inertial)
@@ -272,12 +272,12 @@ class Orbit:
 
         # Get the cartesian state at this time
         N_r, N_v = self.cartesian_state_at_time(time)
-        N_angular_momentum = np.cross(N_r, N_v)
+        N_angularMomentum = np.cross(N_r, N_v)
 
         # Compute basis vectors of Hill frame in inertial frame
         # NOTE: these are all row vectors here, i.e. equivalent to [N_ox]^T
         N_hhat_r = N_r / np.linalg.norm(N_r)
-        N_hhat_h = N_angular_momentum / np.linalg.norm(N_angular_momentum)
+        N_hhat_h = N_angularMomentum / np.linalg.norm(N_angularMomentum)
         N_hhat_theta = np.cross(N_hhat_h, N_hhat_r)
 
         # The basis vectors for the rows of the DCM
@@ -301,22 +301,22 @@ class Orbit:
         """
         # Get the cartesian state at this time
         N_r, N_v = self.cartesian_state_at_time(time)
-        N_angular_momentum = np.cross(N_r, N_v)
+        N_angularMomentum = np.cross(N_r, N_v)
 
         # Angular momentum direction vector
-        h_mag = np.linalg.norm(N_angular_momentum)
-        N_hhat_h = N_angular_momentum / h_mag
+        angularMomentumMagnitude = np.linalg.norm(N_angularMomentum)
+        N_hhat_h = N_angularMomentum / angularMomentumMagnitude
 
         # Instantaneous true anomaly rate
-        r_magnitude = np.linalg.norm(N_r)
-        nu_dot = h_mag / (r_magnitude * r_magnitude)
+        rMagnitude = np.linalg.norm(N_r)
+        nuDot = angularMomentumMagnitude / (rMagnitude * rMagnitude)
 
-        N_omega_HN = nu_dot * N_hhat_h
+        N_omega_HN = nuDot * N_hhat_h
         return N_omega_HN
 
     def deputy_inertial_position_and_velocity_at_time(self, 
-                                                    H_rho:np.ndarray, 
-                                                    H_rhop:np.ndarray, 
+                                                    H_relPosDeputy:np.ndarray, 
+                                                    H_relVelDeputy:np.ndarray, 
                                                     time:float
                                                     ) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -330,12 +330,12 @@ class Orbit:
 
         # Inertial frame relative position and velocity [m], [m/s]
         dcm_NH = dcm_HN.T
-        N_rho_deputy = dcm_NH @ H_rho
-        N_rhop_deputy = dcm_NH @ H_rhop
+        N_relPosDeputy = dcm_NH @ H_relPosDeputy
+        N_relVelDeputy = dcm_NH @ H_relVelDeputy
 
         # Deputy intertial position and velocity [m], [m/s]
-        N_r_deputy = N_rho_deputy + N_r_chief
-        N_v_deputy = N_rhop_deputy + (np.cross(N_omega_HN, N_rho_deputy) + N_v_chief)
+        N_r_deputy = N_relPosDeputy + N_r_chief
+        N_v_deputy = N_relVelDeputy + (np.cross(N_omega_HN, N_relPosDeputy) + N_v_chief)
         return N_r_deputy, N_v_deputy
 
 
@@ -358,12 +358,12 @@ class Orbit:
         N_omega_HN = self.orbit_angular_velocity_at_time(time)
 
         # Inertial frame relative position and velocity [m], [m/s]
-        N_rho_deputy = N_r - N_r_chief
-        N_rhop_deputy = N_rDot - (np.cross(N_omega_HN, N_rho_deputy) + N_v_chief)
+        N_relPosDeputy = N_r - N_r_chief
+        N_relVelDeputy = N_rDot - (np.cross(N_omega_HN, N_relPosDeputy) + N_v_chief)
 
         # Convert to Hill frame
-        H_relPosDeputyuty = dcm_HN @ N_rho_deputy
-        H_relVelDeputyuty = dcm_HN @ N_rhop_deputy
+        H_relPosDeputyuty = dcm_HN @ N_relPosDeputy
+        H_relVelDeputyuty = dcm_HN @ N_relVelDeputy
         return H_relPosDeputyuty, H_relVelDeputyuty
 
     @classmethod
@@ -371,7 +371,7 @@ class Orbit:
                            position: np.ndarray, 
                            velocity: np.ndarray, 
                            time: float = 0.0,
-                           central_body: str = "Earth") -> 'Orbit':
+                           centralBody: str = "Earth") -> 'Orbit':
         """
         Create an Orbit object from Cartesian state.
         
@@ -379,36 +379,36 @@ class Orbit:
             position (np.ndarray): Position vector in inertial frame [m]
             velocity (np.ndarray): Velocity vector in inertial frame [m/s]
             time (float): Time corresponding to the state [s]
-            central_body (str): Central body (default: "Earth")
+            centralBody (str): Central body (default: "Earth")
             
         Returns:
             Orbit: Orbit object with classical orbital elements
         """
         # Set gravitational parameter
-        if central_body == "Earth":
+        if centralBody == "Earth":
             mu = constants.MU_EARTH_M
-        elif central_body == "Mars":
+        elif centralBody == "Mars":
             mu = constants.MU_MARS
         else:
-            raise ValueError(f"Central body '{central_body}' not supported")
+            raise ValueError(f"Central body '{centralBody}' not supported")
         
         # Calculate orbital elements using the same algorithm as in KeplerianDynamics
-        r_mag = np.linalg.norm(position)
-        v_mag = np.linalg.norm(velocity)
+        posMag = np.linalg.norm(position)
+        velMag = np.linalg.norm(velocity)
         
         h = np.cross(position, velocity)
-        h_mag = np.linalg.norm(h)
+        angularMomentumMagnitude = np.linalg.norm(h)
         
         K = np.array([0, 0, 1])
         n = np.cross(K, h)
-        n_mag = np.linalg.norm(n)
+        nMag = np.linalg.norm(n)
         
         # Eccentricity vector
-        e_vec = ((v_mag**2 - mu / r_mag) * position - np.dot(position, velocity) * velocity) / mu
+        e_vec = ((velMag**2 - mu / posMag) * position - np.dot(position, velocity) * velocity) / mu
         ecc = np.linalg.norm(e_vec)
         
         # Specific energy
-        eta = v_mag**2 / 2 - mu / r_mag
+        eta = velMag**2 / 2 - mu / posMag
         
         # Semimajor axis
         if ecc != 1.0:
@@ -417,63 +417,35 @@ class Orbit:
             sma = 0  # Parabolic orbit
         
         # Inclination
-        # if h[2] == 0.0:
-        #     inc = 0.0
-        # else:
-        #     inc = np.arccos(h[2] / h_mag)
-        cos_inc = np.clip(h[2] / h_mag, -1.0, 1.0)
+        cos_inc = np.clip(h[2] / angularMomentumMagnitude, -1.0, 1.0)
         inc = np.arccos(cos_inc)
 
         # RAAN
-        # if n[0] == 0.0:
-        #     raan = 0.0
-        # else:
-        #     raan = np.arccos(n[0] / n_mag)
-        # if n[1] < 0:
-        #      raan = 2 * np.pi - raan
-        if n_mag < 1e-12:
+        if nMag < 1e-12:
             # Near equatorial orbit
             raan = 0.0
         else:
-            cos_raan = np.clip(n[0] / n_mag, -1.0, 1.0)
+            cos_raan = np.clip(n[0] / nMag, -1.0, 1.0)
             raan = np.arccos(cos_raan)
             if n[1] < 0:
                 raan = 2 * np.pi - raan
         
         # Argument of periapsis
-        # if np.dot(n, e_vec) == 0.0:
-        #     argp = 0.0
-        # else:
-        #     argp = np.arccos(np.dot(n, e_vec) / (n_mag * ecc))
-        # if e_vec[2] < 0.0:
-        #     argp = 2 * np.pi - argp
-        if n_mag < 1e-12 or ecc < 1e-12:
+        if nMag < 1e-12 or ecc < 1e-12:
             # Near equatorial or circular orbit
             argp = 0.0
         else:
-            cos_argp = np.clip(np.dot(n, e_vec) / (n_mag * ecc), -1.0, 1.0)
+            cos_argp = np.clip(np.dot(n, e_vec) / (nMag * ecc), -1.0, 1.0)
             argp = np.arccos(cos_argp)
             if e_vec[2] < 0:
                 argp = 2 * np.pi - argp
 
         # True anomaly
-        # print(f"np.dot(e_vec, position): {np.dot(e_vec, position)}")
-        # if np.dot(e_vec, position) == 0.0:
-        #     nu = 0.0
-        # else:
-        #     print(f"e_vec: {e_vec}")
-        #     print(f"position: {position}")
-        #     print(f"ecc: {ecc}")
-        #     print(f"r_mag: {r_mag}")
-        #     print(f"np.dot(e_vec, position) / (ecc * r_mag): {np.dot(e_vec, position) / (ecc * r_mag)}")
-        #     nu = np.arccos(np.dot(e_vec, position) / (ecc * r_mag))
-        # if np.dot(position, velocity) < 0:
-        #     nu = 2 * np.pi - nu
         if ecc < 1e-12:
             # Circular orbit
             nu = 0.0
         else:
-            cos_nu = np.clip(np.dot(e_vec, position) / (ecc * r_mag), -1.0, 1.0)
+            cos_nu = np.clip(np.dot(e_vec, position) / (ecc * posMag), -1.0, 1.0)
             nu = np.arccos(cos_nu)
             if np.dot(position, velocity) < 0:
                 nu = 2 * np.pi - nu
@@ -487,9 +459,6 @@ class Orbit:
             # Compute eccentric anomaly E = 2 * arctan(tan(E/2))
             E = 2 * np.arctan(tan_half_E)
             E = E % (2 * np.pi)
-            # cos_E = (ecc + np.cos(nu)) / (1 + ecc * np.cos(nu))
-            # sin_E = (np.sin(nu) * np.sqrt(1 - ecc**2)) / (1 + ecc * np.cos(nu))
-            # E = np.arctan2(sin_E, cos_E)
             
             # Mean anomaly
             M = E - (ecc * np.sin(E))
@@ -497,45 +466,45 @@ class Orbit:
             # For parabolic orbits, use a different approach
             M = 0  # Placeholder - would need special handling for parabolic orbits
         
-        return cls(semimajor_axis=sma,
+        return cls(semimajorAxis=sma,
                   eccentricity=ecc,
                   inclination=inc,
                   raan=raan,
-                  argument_of_periapsis=argp,
-                  mean_anomaly_at_epoch=M,
-                  time_of_epoch=time,
-                  central_body=central_body)
+                  argumentOfPeriapsis=argp,
+                  meanAnomalyAtEpoch=M,
+                  timeOfEpoch=time,
+                  centralBody=centralBody)
     
 
     @classmethod
     def from_chief_and_delta_oe(cls, 
                                 chiefOrbit: 'Orbit',
-                                delta_semimajor_axis: float,
-                                delta_eccentricity: float,
-                                delta_inclination: float,
-                                delta_raan: float,
-                                delta_ap: float,
-                                delta_mean_anomaly: float) -> 'Orbit':
+                                deltaSemimajorAxis: float,
+                                deltaEccentricity: float,
+                                deltaInclination: float,
+                                deltaRaan: float,
+                                deltaArgumentOfPeriapsis: float,
+                                deltaMeanAnomaly: float) -> 'Orbit':
         """
         Create an Orbit object from the chief orbit and the delta orbit element differences
         """
-        sma = chiefOrbit.semimajor_axis + delta_semimajor_axis
-        ecc = chiefOrbit.eccentricity + delta_eccentricity
-        inc = chiefOrbit.inclination + delta_inclination
-        raan = chiefOrbit.raan + delta_raan
-        argp = chiefOrbit.argument_of_periapsis + delta_ap
-        M = chiefOrbit.mean_anomaly_at_epoch + delta_mean_anomaly
-        time = chiefOrbit.time_of_epoch
-        central_body = chiefOrbit.central_body
+        sma = chiefOrbit.semimajorAxis + deltaSemimajorAxis
+        ecc = chiefOrbit.eccentricity + deltaEccentricity
+        inc = chiefOrbit.inclination + deltaInclination
+        raan = chiefOrbit.raan + deltaRaan
+        argp = chiefOrbit.argumentOfPeriapsis + deltaArgumentOfPeriapsis
+        M = chiefOrbit.meanAnomalyAtEpoch + deltaMeanAnomaly
+        time = chiefOrbit.timeOfEpoch
+        centralBody = chiefOrbit.centralBody
 
-        return cls(semimajor_axis=sma,
+        return cls(semimajorAxis=sma,
                   eccentricity=ecc,
                   inclination=inc,
                   raan=raan,
-                  argument_of_periapsis=argp,
-                  mean_anomaly_at_epoch=M,
-                  time_of_epoch=time,
-                  central_body=central_body)
+                  argumentOfPeriapsis=argp,
+                  meanAnomalyAtEpoch=M,
+                  timeOfEpoch=time,
+                  centralBody=centralBody)
 
     @classmethod
     def delta_oe_from_chief_and_deputy(cls,
@@ -545,42 +514,43 @@ class Orbit:
         Given an orbit definition for a chief and a deputy, compute the orbit element difference
         description of the deputy relative to the chief 
         NOTE: OE differences here are assumed dOE = deputyOE - chiefOE
+
         Args:
             chiefOrbit (Orbit): The chief orbit 
             deputyOrbit (Orbit): The deputy orbit
         Returns:
             Tuple of orbit element differences (in m, rad) of form 
-            delta_sma, delta_ecc, delta_inc, delta_raan, delta_ap, delta_meanAnom 
+            delta_sma, delta_ecc, delta_inc, deltaRaan, deltaArgumentOfPeriapsis, delta_meanAnom 
         """
-        deltaSma = deputyOrbit.semimajor_axis - chiefOrbit.semimajor_axis
+        deltaSma = deputyOrbit.semimajorAxis - chiefOrbit.semimajorAxis
         deltaEcc = deputyOrbit.eccentricity - chiefOrbit.eccentricity
         deltaInc = deputyOrbit.inclination - chiefOrbit.inclination
         deltaRaan = deputyOrbit.raan - chiefOrbit.raan
-        deltaAp = deputyOrbit.argument_of_periapsis - chiefOrbit.argument_of_periapsis
-        deltaMeanAnom = deputyOrbit.mean_anomaly_at_epoch - chiefOrbit.mean_anomaly_at_epoch
+        deltaAp = deputyOrbit.argumentOfPeriapsis - chiefOrbit.argumentOfPeriapsis
+        deltaMeanAnom = deputyOrbit.meanAnomalyAtEpoch - chiefOrbit.meanAnomalyAtEpoch
 
         return (deltaSma, deltaEcc, deltaInc, deltaRaan, deltaAp, deltaMeanAnom)
 
     def __str__(self) -> str:
         """String representation of the orbit."""
-        return (f"Orbit(central_body={self.central_body}, "
-                f"a={self.semimajor_axis:.2e} m, "
+        return (f"Orbit(centralBody={self.centralBody}, "
+                f"a={self.semimajorAxis:.2e} m, "
                 f"e={self.eccentricity:.6f}, "
                 f"i={np.degrees(self.inclination):.2f}°, "
                 f"Ω={np.degrees(self.raan):.2f}°, "
-                f"ω={np.degrees(self.argument_of_periapsis):.2f}°, "
-                f"M₀={np.degrees(self.mean_anomaly_at_epoch):.2f}°, "
-                f"t₀={self.time_of_epoch:.1f} s)")
+                f"ω={np.degrees(self.argumentOfPeriapsis):.2f}°, "
+                f"M₀={np.degrees(self.meanAnomalyAtEpoch):.2f}°, "
+                f"t₀={self.timeOfEpoch:.1f} s)")
     
     def __repr__(self) -> str:
         """Detailed string representation of the orbit."""
         return (f"Orbit(\n"
-                f"  semimajor_axis={self.semimajor_axis},\n"
+                f"  semimajorAxis={self.semimajorAxis},\n"
                 f"  eccentricity={self.eccentricity},\n"
                 f"  inclination={self.inclination},\n"
                 f"  raan={self.raan},\n"
-                f"  argument_of_periapsis={self.argument_of_periapsis},\n"
-                f"  mean_anomaly_at_epoch={self.mean_anomaly_at_epoch},\n"
-                f"  time_of_epoch={self.time_of_epoch},\n"
-                f"  central_body='{self.central_body}'\n"
+                f"  argumentOfPeriapsis={self.argumentOfPeriapsis},\n"
+                f"  meanAnomalyAtEpoch={self.meanAnomalyAtEpoch},\n"
+                f"  timeOfEpoch={self.timeOfEpoch},\n"
+                f"  centralBody='{self.centralBody}'\n"
                 f")")

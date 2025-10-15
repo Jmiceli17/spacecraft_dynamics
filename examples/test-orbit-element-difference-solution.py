@@ -10,12 +10,12 @@ from spacecraft_dynamics.utils import true_to_mean_anomaly
 
 def deputy_hill_frame_position_at_true_anomaly(
                                             chiefOrbit:Orbit,
-                                            delta_semimajor_axis: float,
-                                            delta_eccentricity: float,
-                                            delta_inclination: float,
-                                            delta_raan: float,
-                                            delta_ap: float,
-                                            delta_mean_anomaly: float,
+                                            deltaSemimajorAxis: float,
+                                            deltaEccentricity: float,
+                                            deltaInclination: float,
+                                            deltaRaan: float,
+                                            deltaArgumentOfPeriapsis: float,
+                                            deltaMeanAnomaly: float,
                                             trueAnomaly:float
                                             ) -> np.ndarray:
     """
@@ -26,17 +26,17 @@ def deputy_hill_frame_position_at_true_anomaly(
     Returns: Hill frame position of the deputy when the chief has this true anomaly [m]
     """
 
-    deltaA, deltaEcc, deltaInc, deltaRaan, deltaAp, deltaMeanAnom = delta_semimajor_axis, delta_eccentricity, delta_inclination, delta_raan, delta_ap, delta_mean_anomaly
+    deltaA, deltaEcc, deltaInc, deltaRaan, deltaAp, deltaMeanAnom = deltaSemimajorAxis, deltaEccentricity, deltaInclination, deltaRaan, deltaArgumentOfPeriapsis, deltaMeanAnomaly
 
     # Get the necessary chief orbit params
-    sma = chiefOrbit.semimajor_axis
+    sma = chiefOrbit.semimajorAxis
     ecc = chiefOrbit.eccentricity
     inc = chiefOrbit.inclination
 
-    q1 = ecc * np.cos(chiefOrbit.argument_of_periapsis)
-    q2 = ecc * np.sin(chiefOrbit.argument_of_periapsis)
+    q1 = ecc * np.cos(chiefOrbit.argumentOfPeriapsis)
+    q2 = ecc * np.sin(chiefOrbit.argumentOfPeriapsis)
     eta = np.sqrt(1. - (q1 * q1) - (q2 * q2))
-    trueLatitude = chiefOrbit.argument_of_periapsis + trueAnomaly
+    trueLatitude = chiefOrbit.argumentOfPeriapsis + trueAnomaly
     r = (sma * eta * eta) / (1. + (ecc * np.cos(trueAnomaly)))
 
     # x/y/z components of position in Hill frame [m]
@@ -51,41 +51,41 @@ def deputy_hill_frame_position_at_true_anomaly(
 
 def main():
 
-    mean_anomaly_at_epoch = true_to_mean_anomaly(true_anomaly=np.radians(10.0), eccentricity=0.2)
+    meanAnomalyAtEpoch = true_to_mean_anomaly(true_anomaly=np.radians(10.0), eccentricity=0.2)
 
-    chiefOrbit = Orbit(semimajor_axis=10000e3, 
+    chiefOrbit = Orbit(semimajorAxis=10000e3, 
                         eccentricity=0.2, 
                         inclination=np.radians(37.0),
                         raan=np.radians(40.0),
-                        argument_of_periapsis=np.radians(65.0),
-                        mean_anomaly_at_epoch=mean_anomaly_at_epoch,
-                        time_of_epoch=0.0
+                        argumentOfPeriapsis=np.radians(65.0),
+                        meanAnomalyAtEpoch=meanAnomalyAtEpoch,
+                        timeOfEpoch=0.0
                         )
 
 
 
     trueAnomaly_1 = np.radians(10.0)
     trueAnomaly_2 = trueAnomaly_1 + np.radians(60.0)
-    H_rho_1 = deputy_hill_frame_position_at_true_anomaly(chiefOrbit=chiefOrbit, 
-                                                        delta_semimajor_axis=0.0,
-                                                        delta_eccentricity=0.0001,
-                                                        delta_inclination=0.001,
-                                                        delta_raan=0.001,
-                                                        delta_ap=0.001,
-                                                        delta_mean_anomaly=-0.001,
+    H_relPosDeputy_1 = deputy_hill_frame_position_at_true_anomaly(chiefOrbit=chiefOrbit, 
+                                                        deltaSemimajorAxis=0.0,
+                                                        deltaEccentricity=0.0001,
+                                                        deltaInclination=0.001,
+                                                        deltaRaan=0.001,
+                                                        deltaArgumentOfPeriapsis=0.001,
+                                                        deltaMeanAnomaly=-0.001,
                                                         trueAnomaly=trueAnomaly_1)
 
-    H_rho_2 = deputy_hill_frame_position_at_true_anomaly(chiefOrbit=chiefOrbit, 
-                                                        delta_semimajor_axis=0.0,
-                                                        delta_eccentricity=0.0001,
-                                                        delta_inclination=0.001,
-                                                        delta_raan=0.001,
-                                                        delta_ap=0.001,
-                                                        delta_mean_anomaly=-0.001,
+    H_relPosDeputy_2 = deputy_hill_frame_position_at_true_anomaly(chiefOrbit=chiefOrbit, 
+                                                        deltaSemimajorAxis=0.0,
+                                                        deltaEccentricity=0.0001,
+                                                        deltaInclination=0.001,
+                                                        deltaRaan=0.001,
+                                                        deltaArgumentOfPeriapsis=0.001,
+                                                        deltaMeanAnomaly=-0.001,
                                                         trueAnomaly=trueAnomaly_2)
 
-    print(f"H_rho_0: [{H_rho_1 * 1e-3}] # km")
-    print(f"H_rho_1: [{H_rho_2 * 1e-3}] # km")
+    print(f"H_relPosDeputy_0: [{H_relPosDeputy_1 * 1e-3}] # km")
+    print(f"H_relPosDeputy_1: [{H_relPosDeputy_2 * 1e-3}] # km")
 
 if __name__ == "__main__":
     main()

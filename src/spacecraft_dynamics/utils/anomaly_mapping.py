@@ -5,12 +5,12 @@ def true_to_mean_anomaly(true_anomaly:float, eccentricity:float) -> float:
     """
     Convert true anomaly to mean anomaly for an elliptical orbit.
     
-    Parameters:
-    true_anomaly (float): True anomaly in radians
-    eccentricity (float): Eccentricity of the orbit (0 < e < 1 for elliptical orbits)
+    Args:
+        true_anomaly (float): True anomaly [rad]
+        eccentricity (float): Eccentricity of the orbit (0 < e < 1 for elliptical orbits)
     
     Returns:
-    float: Mean anomaly in radians
+        Mean anomaly [rad]
     """
     # Input validation
     if not 0 <= eccentricity < 1:

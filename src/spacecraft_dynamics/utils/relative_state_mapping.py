@@ -49,15 +49,15 @@ def mapping_oe_differences_to_relative_cartesian_state(chiefOrbit:'Orbit'=None,
 
     # Exctract orbit params to make expressions more concise
     if chiefOrbit:
-        sma = chiefOrbit.semimajor_axis
+        sma = chiefOrbit.semimajorAxis
         ecc = chiefOrbit.eccentricity
         inc = chiefOrbit.inclination
         raan = chiefOrbit.raan
-        omega = chiefOrbit.argument_of_periapsis
+        omega = chiefOrbit.argumentOfPeriapsis
         trueLat = omega + trueAnomaly
         q1 = ecc * np.cos(omega)
         q2 = ecc * np.sin(omega)
-        p = chiefOrbit.semi_latus_rectum
+        p = chiefOrbit.semiLatusRectum
         mu = chiefOrbit.mu
 
     else:
@@ -183,15 +183,15 @@ def mapping_cartesian_state_to_oe_differences(chiefOrbit:'Orbit'=None,
 
     # Exctract orbit params to make expressions more concise
     if chiefOrbit:
-        sma = chiefOrbit.semimajor_axis
+        sma = chiefOrbit.semimajorAxis
         ecc = chiefOrbit.eccentricity
         inc = chiefOrbit.inclination
         raan = chiefOrbit.raan
-        omega = chiefOrbit.argument_of_periapsis
+        omega = chiefOrbit.argumentOfPeriapsis
         trueLat = omega + trueAnomaly
         q1 = ecc * np.cos(omega)
         q2 = ecc * np.sin(omega)
-        p = chiefOrbit.semi_latus_rectum
+        p = chiefOrbit.semiLatusRectum
         mu = chiefOrbit.mu
 
     else:

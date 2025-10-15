@@ -39,7 +39,7 @@ if __name__== "__main__":
     print(f"initial_rd_N = [{N_position_dep[0]}, {N_position_dep[1]}, {N_position_dep[2]}] # km")
     print(f"initial_vd_N = [{N_velocity_dep[0]}, {N_velocity_dep[1]}, {N_velocity_dep[2]}] # km/s")
 
-    tInit = chief_orbit.time_of_epoch
+    tInit = chief_orbit.timeOfEpoch
     useLinearizedEoms = True
     tMax = 2000
     tStep = 0.01

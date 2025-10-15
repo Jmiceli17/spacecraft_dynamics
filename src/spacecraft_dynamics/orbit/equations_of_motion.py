@@ -41,13 +41,13 @@ class FormationDynamicsBase():
         start_idx = 6 + deputyIdx * 6
         return stateArray[start_idx:start_idx + 3], stateArray[start_idx + 3:start_idx + 6]
 
-    def _set_deputy_state(self, stateArray: np.ndarray, deputyIdx: int, H_rho: np.ndarray, H_rhop: np.ndarray) -> None:
+    def _set_deputy_state(self, stateArray: np.ndarray, deputyIdx: int, H_relPosDeputy: np.ndarray, H_relVelDeputy: np.ndarray) -> None:
         """Set deputy state in flat array (for initial conditions)
         NOTE: This modifies the stateArray in place
         """
         start_idx = 6 + deputyIdx * 6
-        stateArray[start_idx:start_idx + 3] = H_rho
-        stateArray[start_idx + 3:start_idx + 6] = H_rhop
+        stateArray[start_idx:start_idx + 3] = H_relPosDeputy
+        stateArray[start_idx + 3:start_idx + 6] = H_relVelDeputy
 
 
     def compute_state_derivatives(self, t: float, stateArray: np.ndarray, useLinearizedEoms:bool=False) -> np.ndarray:
@@ -81,14 +81,14 @@ class FormationDynamicsBase():
         """
         # 1. Pack initial state: chief inertial + all deputies' Hill-frame states
         chief_pos, chief_vel = self.orbit.cartesian_state_at_time(t_init)
-        # Each element in self.deputy_states is a 6-element array: [H_rho, H_rhop]
+        # Each element in self.deputy_states is a 6-element array: [H_relPosDeputy, H_relVelDeputy]
         initial_state = np.hstack([chief_pos, chief_vel] + [dep for dep in self.deputy_states])
 
         # Initialize time and state
         t = t_init
         # Total state vector is inertial position/velocity of chief and 
         # Hill frame relative position and velocity of each deputy 
-        # [N_rc, N_vc, H_rho_d1, H_rhop_d1, H_rho_d2, H_rhop_d2, ...]
+        # [N_rc, N_vc, H_relPosDeputy_d1, H_relVelDeputy_d1, H_relPosDeputy_d2, H_relVelDeputy_d2, ...]
         current_state = initial_state.copy()
 
         # Initialize solution dictionary
@@ -282,7 +282,7 @@ class FormationDynamics(FormationDynamicsBase):
 
         true_anom_rate = self.orbit.true_anomaly_rate_at_time(t)
 
-        p = self.orbit.semi_latus_rectum
+        p = self.orbit.semiLatusRectum
         
         # Compute state accelerations
         xDdot = 2.0 * true_anom_rate * (yDot - (y * (rcDot / rChief))) + (x * true_anom_rate * true_anom_rate) * (1.0 + (2.0 * (rChief / p)))

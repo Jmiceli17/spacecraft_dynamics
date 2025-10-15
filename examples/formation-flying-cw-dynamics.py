@@ -8,14 +8,14 @@ from spacecraft_dynamics.orbit import Orbit, CwDynamics
 if __name__== "__main__":
 
     # Initialize the circular chief orbit
-    # NOTE: Only semimajor_axis is specified here, the other parameters are arbitrarily set
-    chief_orbit = Orbit(semimajor_axis=6800 * 1000,
+    # NOTE: Only semimajorAxis is specified here, the other parameters are arbitrarily set
+    chief_orbit = Orbit(semimajorAxis=6800 * 1000,
                         eccentricity=0.0,
                         inclination=0.0,
                         raan=0.0,
-                        argument_of_periapsis=0.0,
-                        mean_anomaly_at_epoch=0.0,
-                        time_of_epoch=0.0)
+                        argumentOfPeriapsis=0.0,
+                        meanAnomalyAtEpoch=0.0,
+                        timeOfEpoch=0.0)
 
     # Initialize the relative position and velocity of the deputy 
     # (in Hill frame coordinates) [m], [m/s]
@@ -28,7 +28,7 @@ if __name__== "__main__":
 
     circularFormationDynamics = CwDynamics(chief_orbit, deputyStates)
 
-    tInit = chief_orbit.time_of_epoch
+    tInit = chief_orbit.timeOfEpoch
     useLinearizedEoms = True
     tMax = 1300
     tStep = 0.01

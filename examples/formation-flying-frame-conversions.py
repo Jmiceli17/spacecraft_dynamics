@@ -26,15 +26,15 @@ if __name__ == "__main__":
     N_v_deputy = np.array([-3.913302, -6.258661, 1.598199]) * 1000.0
 
     # Relative position and velocity of the deputy in the Chief's Hill frame [m], [m/s]
-    N_rho_deputy = N_r_deputy - N_r_chief
+    N_relPosDeputy = N_r_deputy - N_r_chief
     dcm_HN = chief_orbit.hill_frame_at_time(0)
-    H_relPosDeputyuty = dcm_HN @ N_rho_deputy
+    H_relPosDeputyuty = dcm_HN @ N_relPosDeputy
 
     # Orbit frame angular velocity relative to inertial frame
     N_omega_HN = chief_orbit.orbit_angular_velocity_at_time(0)
     H_omega_HN = dcm_HN @ N_omega_HN
 
-    H_relVelDeputyuty = dcm_HN @ ((N_v_deputy - N_v_chief) - (np.cross(N_omega_HN, N_rho_deputy)))
+    H_relVelDeputyuty = dcm_HN @ ((N_v_deputy - N_v_chief) - (np.cross(N_omega_HN, N_relPosDeputy)))
 
     # Convert to [km], [km/s]
     H_relPosDeputyuty = H_relPosDeputyuty / 1000.0
@@ -60,12 +60,12 @@ if __name__ == "__main__":
 
     # Inertial frame relative position and velocity [m], [m/s]
     dcm_NH = dcm_HN.T
-    N_rho_deputy = dcm_NH @ H_relPosDeputyuty
-    N_rhop_deputy = dcm_NH @ H_relVelDeputyuty
+    N_relPosDeputy = dcm_NH @ H_relPosDeputyuty
+    N_relVelDeputy = dcm_NH @ H_relVelDeputyuty
 
     # Deputy intertial position and velocity [m], [m/s]
-    N_r_deputy = N_rho_deputy + N_r_chief
-    N_v_deputy = N_rhop_deputy + np.cross(N_omega_HN, N_rho_deputy) + N_v_chief
+    N_r_deputy = N_relPosDeputy + N_r_chief
+    N_v_deputy = N_relVelDeputy + np.cross(N_omega_HN, N_relPosDeputy) + N_v_chief
 
     # Convert to [km], [km/s]
     N_r_deputy = N_r_deputy / 1000

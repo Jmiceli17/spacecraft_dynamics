@@ -22,25 +22,25 @@ def CwAnaltyicalSolution(A0:float,
     x = A0 * np.cos(mean_motion * time + alpha) + x_off
     y = -2.0 * A0 * np.sin(mean_motion * time + alpha) - (3.0 / 2.0) * mean_motion * time * x_off + y_off
     z = B0 * np.cos(mean_motion * time + beta)
-    H_rho = np.array([x, y, z])
+    H_relPosDeputy = np.array([x, y, z])
     
     xDot = -A0 * np.sin(mean_motion * time + alpha) * mean_motion
     yDot = -2.0 * A0 * np.cos(mean_motion * time + alpha) * mean_motion - (3.0 / 2.0) * mean_motion * x_off
     zDot = - B0 * np.sin(mean_motion * time + beta) * mean_motion
-    H_rhop = np.array([xDot, yDot, zDot])
-    return H_rho, H_rhop
+    H_relVelDeputy = np.array([xDot, yDot, zDot])
+    return H_relPosDeputy, H_relVelDeputy
 
 if __name__== "__main__":
 
     # Initialize the circular chief orbit
-    # NOTE: Only semimajor_axis is specified here, the other parameters are arbitrarily set
-    chief_orbit = Orbit(semimajor_axis=7500 * 1000,
+    # NOTE: Only semimajorAxis is specified here, the other parameters are arbitrarily set
+    chief_orbit = Orbit(semimajorAxis=7500 * 1000,
                         eccentricity=0.0,
                         inclination=0.0,
                         raan=0.0,
-                        argument_of_periapsis=0.0,
-                        mean_anomaly_at_epoch=0.0,
-                        time_of_epoch=0.0)
+                        argumentOfPeriapsis=0.0,
+                        meanAnomalyAtEpoch=0.0,
+                        timeOfEpoch=0.0)
     # Define initial condition parameters
     A0 = 0.0
     B0 = 0.0
@@ -70,7 +70,7 @@ if __name__== "__main__":
     print(f"Deputy initial absolute position according to CW solution: {N_position_dep} [m; Hill]")
     print(f"Deputy initial absolute velocity according to CW solution: {N_velocity_dep} [m/s; Hill]")
 
-    tInit = chief_orbit.time_of_epoch
+    tInit = chief_orbit.timeOfEpoch
     tMax = 2000
     tStep = 0.1
 
