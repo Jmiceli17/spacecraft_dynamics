@@ -22,3 +22,6 @@ MU_EARTH_KM = 3.986e5
 
 MU_EARTH_M = 3.986004418e14
 """Standard gravitational param for Earth [m^3/s^2]"""
+
+J2_EARTH = 1.086262668e-03
+"""J2 term for Earth [dimensionless]"""
