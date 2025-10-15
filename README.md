@@ -45,6 +45,7 @@ See the `examples/` directory for usage examples:
 - Attitude control simulations
 - Actuator configurations
 - Orbital scenarios
+- Scripts that demonstrate how to use certain classes and utility functions (developed for various quizes and homeworks)
 ```bash
 # Example usage
 cd spacecraft_dynamics/examples

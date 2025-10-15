@@ -23,6 +23,14 @@ from .initial_conditions import (
     GMO_ORBIT_RATE,
     GMO_ALT_M
 )
+from .relative_state_mapping import (
+    mapping_oe_differences_to_relative_cartesian_state,
+    mapping_cartesian_state_to_oe_differences
+)
+
+from .anomaly_mapping import (
+    true_to_mean_anomaly
+)
 
 __all__ = [
     "MU_MARS",
@@ -44,5 +52,8 @@ __all__ = [
     "GMO_INC_0_RAD",
     "GMO_THETA_0_RAD",
     "GMO_ORBIT_RATE",
-    "GMO_ALT_M"
+    "GMO_ALT_M",
+    "mapping_oe_differences_to_relative_cartesian_state",
+    "mapping_cartesian_state_to_oe_differences",
+    "true_to_mean_anomaly"
 ]

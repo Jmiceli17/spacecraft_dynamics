@@ -17,7 +17,7 @@ import numpy as np
 
 
 class BaseSpacecraftDynamics(ABC):
-    """Abstract base class for spacecraft dynamics"""
+    """Abstract base class for spacecraft attitude dynamics"""
     
     def __init__(self, spacecraft: Spacecraft):
         """Initialize the dynamics model
@@ -28,12 +28,12 @@ class BaseSpacecraftDynamics(ABC):
         self.spacecraft = spacecraft
 
     @abstractmethod
-    def compute_state_derivatives(self, t: float, state_array: np.array, **kwargs) -> np.array:
+    def compute_state_derivatives(self, t: float, stateArray: np.array, **kwargs) -> np.array:
         """Compute state derivatives based on current state and inputs
         
         Args:
             t (float): Current time
-            state_array (np.array): Current state vector
+            stateArray (np.array): Current state vector
             **kwargs: Additional arguments specific to dynamics type
             
         Returns:
@@ -199,14 +199,14 @@ class BaseSpacecraftDynamics(ABC):
 
     def compute_state_derivatives(self, 
                                 t: float, 
-                                state_array: np.array,
+                                stateArray: np.array,
                                 external_torque=np.array([0,0,0])) -> np.array:
         """
         Compute state derivatives including control torque
         TODO: move external_torque to spacecraft?
         """
         # Convert array to state object
-        state = SpacecraftState.from_array(state_array, spacecraft=self.spacecraft)
+        state = SpacecraftState.from_array(stateArray, spacecraft=self.spacecraft)
 
         # Extract state variables
         sigma_BN = state.sigma_BN
