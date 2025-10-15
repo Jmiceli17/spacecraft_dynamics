@@ -1,3 +1,8 @@
+"""
+Script that uses the full nonlinear (2 body) equations of motion to model the motion of deputies
+relative to a chief and simulates the formation
+"""
+
 import numpy as np
 from spacecraft_dynamics.orbit import Orbit, FormationDynamics
 
@@ -50,15 +55,15 @@ if __name__== "__main__":
     # Print each deputy's final state
     num_deputies = len(deputyStates)
     for i in range(num_deputies):
-        H_rho_dep_final = solution[f'deputy_{i}_rho'][-1]
-        H_rhop_dep_final = solution[f'deputy_{i}_rhop'][-1]
+        H_relPosDeputy_final = solution[f'deputy_{i}_rho'][-1]
+        H_relVelDeputy_final = solution[f'deputy_{i}_rhop'][-1]
         print(f"Deputy relative state converted in Hill frame:")
-        print(f"  Final deputy {i} rho: {H_rho_dep_final / 1000} [km; Hill]")
-        print(f"  Final deputy {i} rhop: {H_rhop_dep_final / 1000} [km/s; Hill]")
+        print(f"  Final deputy {i} rho: {H_relPosDeputy_final / 1000} [km; Hill]")
+        print(f"  Final deputy {i} rhop: {H_relVelDeputy_final / 1000} [km/s; Hill]")
 
         N_pos_dep_final, N_vel_dep_final = chief_orbit.deputy_inertial_position_and_velocity_at_time(
-                                                    H_rho_dep_final, 
-                                                    H_rhop_dep_final, 
+                                                    H_relPosDeputy_final, 
+                                                    H_relVelDeputy_final, 
                                                     tMax)
         print(f"Deputy absolute state in inertial frame:")
         print(f"  Final deputy {i} N_pos: {N_pos_dep_final / 1000}")

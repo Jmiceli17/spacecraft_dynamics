@@ -362,9 +362,9 @@ class Orbit:
         N_rhop_deputy = N_rDot - (np.cross(N_omega_HN, N_rho_deputy) + N_v_chief)
 
         # Convert to Hill frame
-        H_rho_deputy = dcm_HN @ N_rho_deputy
-        H_rhop_deputy = dcm_HN @ N_rhop_deputy
-        return H_rho_deputy, H_rhop_deputy
+        H_relPosDeputyuty = dcm_HN @ N_rho_deputy
+        H_relVelDeputyuty = dcm_HN @ N_rhop_deputy
+        return H_relPosDeputyuty, H_relVelDeputyuty
 
     @classmethod
     def from_cartesian_state(cls, 

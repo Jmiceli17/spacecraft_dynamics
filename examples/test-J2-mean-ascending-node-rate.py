@@ -11,11 +11,9 @@ def main():
     i = np.radians(33.0) # [rad]
     n = np.sqrt(constants.MU_EARTH_M / (a * a * a))
     p = a * (1.0 - e * e)
-    # Dimensionless J2 term
-    J2 = 1.086262668e-03
 
     # Calculate differential mean ascending node rate [rad/s]
-    dRaanDt = -3 / 2 * J2 * n * (((constants.R_EARTH) / p)**2) * np.cos(i)
+    dRaanDt = -3 / 2 * constants.J2_EARTH * n * (((constants.R_EARTH) / p)**2) * np.cos(i)
 
     # Time to complete one revolution
     revTime = 2 * math.pi / dRaanDt

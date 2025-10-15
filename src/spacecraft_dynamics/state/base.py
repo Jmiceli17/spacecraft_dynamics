@@ -141,7 +141,7 @@ class SpacecraftState:
         """Convert state to array format
         # TODO: add position and velocity
         """
-        state_array = np.concatenate((self.sigma_BN.as_array(), self.B_omega_BN))
+        stateArray = np.concatenate((self.sigma_BN.as_array(), self.B_omega_BN))
 
         if self.actuator_states:
             if format == "new":
@@ -156,9 +156,9 @@ class SpacecraftState:
             else:  # "old" format
                 actuator_arrays = np.concatenate([state.to_array() for state in self.actuator_states])
 
-            state_array = np.concatenate((state_array, actuator_arrays))
+            stateArray = np.concatenate((stateArray, actuator_arrays))
 
-        return state_array
+        return stateArray
 
     @classmethod
     def from_array(cls, array, spacecraft=None, format="new"):

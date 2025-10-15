@@ -41,9 +41,9 @@ if __name__== "__main__":
     print(f"Final chief velocity: {solution['velocity'][-1]} [m/s]")
     
     # Only 1 deputy in this scenario
-    deputy_idx = 0
-    H_rho_dep_final = solution[f'deputy_{deputy_idx}_rho'][-1]
-    H_rhop_dep_final = solution[f'deputy_{deputy_idx}_rhop'][-1]
+    deputyIdx = 0
+    H_relPosDeputy_final = solution[f'deputy_{deputyIdx}_rho'][-1]
+    H_relVelDeputy_final = solution[f'deputy_{deputyIdx}_rhop'][-1]
     print(f"Deputy relative state converted in Hill frame:")
-    print(f"  Final deputy {deputy_idx} rho: {H_rho_dep_final / 1000} [km; Hill]")
-    print(f"  Final deputy {deputy_idx} rhop: {H_rhop_dep_final / 1000} [km/s; Hill]")
+    print(f"  Final deputy {deputyIdx} rho: {H_relPosDeputy_final / 1000} [km; Hill]")
+    print(f"  Final deputy {deputyIdx} rhop: {H_relVelDeputy_final / 1000} [km/s; Hill]")

@@ -14,12 +14,9 @@ def main():
     de = 0.05
     di = np.radians(1.0)
 
-    # Dimensionless J2 term
-    J2 = 1.086262668e-03
-
     # Compute rate of change of mean ascending node difference using the first variation of dRaan / dt
     eta = np.sqrt(1.0 - (ecc * ecc))
-    epsilon =  3.0 * J2 * (constants.R_EARTH / (sma * (1.0 - ecc * ecc)))**2
+    epsilon =  3.0 * constants.J2_EARTH * (constants.R_EARTH / (sma * (1.0 - ecc * ecc)))**2
     dKappaRaan = (7.0 / 4.0 * np.cos(inc) * da / sma) - (2.0 * ecc / (eta * eta) * np.cos(inc) * de) + (1.0 / 2.0 * np.sin(inc) * di)
 
     # dRaanDot(t)

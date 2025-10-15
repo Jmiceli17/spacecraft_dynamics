@@ -18,7 +18,7 @@ if __name__ == "__main__":
     """
     CASE 1:
     Given inertial position and velocity of a the chief and deputy spacecraft, 
-    determine the coresponing rho and rho' vector in the Chief's orbit frame
+    determine the coresponing rho and rho' vector, the relative position and velocity of the deputy in the Chief's orbit frame
     """
 
     # Deputy intertial position and velocity 
@@ -28,21 +28,21 @@ if __name__ == "__main__":
     # Relative position and velocity of the deputy in the Chief's Hill frame [m], [m/s]
     N_rho_deputy = N_r_deputy - N_r_chief
     dcm_HN = chief_orbit.hill_frame_at_time(0)
-    H_rho_deputy = dcm_HN @ N_rho_deputy
+    H_relPosDeputyuty = dcm_HN @ N_rho_deputy
 
     # Orbit frame angular velocity relative to inertial frame
     N_omega_HN = chief_orbit.orbit_angular_velocity_at_time(0)
     H_omega_HN = dcm_HN @ N_omega_HN
 
-    H_rhop_deputy = dcm_HN @ ((N_v_deputy - N_v_chief) - (np.cross(N_omega_HN, N_rho_deputy)))
+    H_relVelDeputyuty = dcm_HN @ ((N_v_deputy - N_v_chief) - (np.cross(N_omega_HN, N_rho_deputy)))
 
     # Convert to [km], [km/s]
-    H_rho_deputy = H_rho_deputy / 1000.0
-    H_rhop_deputy = H_rhop_deputy / 1000.0
-    print(f"H_rhop_deputy: {H_rhop_deputy}")
+    H_relPosDeputyuty = H_relPosDeputyuty / 1000.0
+    H_relVelDeputyuty = H_relVelDeputyuty / 1000.0
+    print(f"H_relVelDeputyuty: {H_relVelDeputyuty}")
     print(f"Case 1:")
-    print(f"rho_H = [{H_rho_deputy[0]}, {H_rho_deputy[1]}, {H_rho_deputy[2]}]")
-    print(f"rhoP_H = [{H_rhop_deputy[0]}, {H_rhop_deputy[1]}, {H_rhop_deputy[2]}]")
+    print(f"rho_H = [{H_relPosDeputyuty[0]}, {H_relPosDeputyuty[1]}, {H_relPosDeputyuty[2]}]")
+    print(f"rhoP_H = [{H_relVelDeputyuty[0]}, {H_relVelDeputyuty[1]}, {H_relVelDeputyuty[2]}]")
 
 
 
@@ -55,13 +55,13 @@ if __name__ == "__main__":
     of the deputy spacecraft
     """
     # Hill frame relative position and velocity of the deputy [m], [m/s]
-    H_rho_deputy = np.array([-0.537,1.221,1.106]) * 1000
-    H_rhop_deputy = np.array([0.000486,0.001158,0.0005590]) * 1000
+    H_relPosDeputyuty = np.array([-0.537,1.221,1.106]) * 1000
+    H_relVelDeputyuty = np.array([0.000486,0.001158,0.0005590]) * 1000
 
     # Inertial frame relative position and velocity [m], [m/s]
     dcm_NH = dcm_HN.T
-    N_rho_deputy = dcm_NH @ H_rho_deputy
-    N_rhop_deputy = dcm_NH @ H_rhop_deputy
+    N_rho_deputy = dcm_NH @ H_relPosDeputyuty
+    N_rhop_deputy = dcm_NH @ H_relVelDeputyuty
 
     # Deputy intertial position and velocity [m], [m/s]
     N_r_deputy = N_rho_deputy + N_r_chief

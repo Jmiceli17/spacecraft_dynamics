@@ -3,9 +3,8 @@ In this script, we analyze the difference between using the analytical solution 
 and the full nonlinear differential equations of relative motion for a leader-follower formation
 with a large separation distance
 """
-from ast import arg
 import numpy as np
-from spacecraft_dynamics.orbit import Orbit, FormationDynamics, CwDynamics
+from spacecraft_dynamics.orbit import Orbit, FormationDynamics
 
 def CwAnaltyicalSolution(A0:float, 
                         B0:float, 
@@ -79,14 +78,14 @@ if __name__== "__main__":
     solution = chiefDynamics.simulate(t_init=tInit, t_max=tMax, t_step=tStep)
 
     # Only 1 deputy in this scenario
-    deputy_idx = 0
+    deputyIdx = 0
     
     # Get relative position of deputy in Hill frame from simulation of nonlinear relative dynamics [m]
-    H_rho_dep_final = solution[f'deputy_{deputy_idx}_rho'][-1]
-    print(f"Deputy final relative position from simulation of nonlinear relative equations of motion: {H_rho_dep_final} [m; Hill]")
+    H_relPosDeputy_final = solution[f'deputy_{deputyIdx}_rho'][-1]
+    print(f"Deputy final relative position from simulation of nonlinear relative equations of motion: {H_relPosDeputy_final} [m; Hill]")
 
     # Compute the separation distance according to the propagation of the nonlinear equations of motion 
-    sepDistance = np.linalg.norm(H_rho_dep_final)
+    sepDistance = np.linalg.norm(H_relPosDeputy_final)
     print(f"Separation distance from simulation of nonlinear relative equations of motion {sepDistance} [m]")
 
     # Relative position of deputy according to CW solution
@@ -97,4 +96,4 @@ if __name__== "__main__":
     # Compute the change in separation distance
     sepDistanceChange = sepDistance - sepDistanceCw
     # sepDistanceChangeInertial = sepDistanceInertial - sepDistanceCw
-    print(f"Deputy {deputy_idx} change in separation distance: {sepDistanceChange / 1000} [km]")
+    print(f"Deputy {deputyIdx} change in separation distance: {sepDistanceChange / 1000} [km]")
