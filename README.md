@@ -9,13 +9,14 @@ A Python package developed from various assignments and projects completed for c
     - None (control authority is assumed)
 - Support for different control algorithms
 - Support for different guidance algorithms
-
+- Relative motion dynamics modeling (for formation flying and collision avoidance uses)
 
 ## Coming Soon
 - Guidance algorithms as the primary interface to the satellite (this is how most 
 3rd party software uses an ADCS!)
-- Orbit propagation
-    - Some of the example scenarios fake this by converting propagating spherical coordinates over 
+- Combining orbit propagation and formation flying dynamics with rotational dynamics
+    - Currently these things are somewhat decoupled (a full pos/vel/att/angVel sim can be constructed right now but it'd be annoying)
+    - Some of the example scenarios fake orbit prop by converting propagating spherical coordinates over 
     time and converting them to cartesian (no equations of motion are actually modeled though)
 
 ## Installation
@@ -52,7 +53,7 @@ cd spacecraft_dynamics/examples
 python mission-simulation.py
 ```
 #### NOTE
-If running in WSL2, you will have to install and start [XLaunch/VcXsrv](https://sourceforge.net/projects/vcxsrv/) (or some other X-server) in order for the plots to display.
+If running in WSL2, you may have to install and start [XLaunch/VcXsrv](https://sourceforge.net/projects/vcxsrv/) (or some other X-server) in order for the plots to display.
 
 
 ## Development
