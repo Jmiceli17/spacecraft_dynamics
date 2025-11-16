@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=64.0", "wheel", "setuptools_scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -35,6 +35,7 @@ dev = [
     "flake8>=4.0",
     "black>=22.0",
     "mypy>=0.9",
+    "PyQt6>=5.15.11
 ]
 docs = [
     "sphinx>=4.0",

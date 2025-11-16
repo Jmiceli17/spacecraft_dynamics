@@ -19,8 +19,6 @@ from .rotational_motion_integration import (
 
 __all__ = [
     "Spacecraft",
-    "Vscmg",
-    "ReactionWheel",
     "ControlGains",
     "TorqueFreeSpacecraftDynamics",
     "ControlledSpacecraftDynamics",

@@ -1,5 +1,5 @@
 # Spacecraft Dynamics
-A Python package developed from various assignments and projects completed for courses in the Aerospace Engineering Department at CU Boulder.
+A Python package developed from various courses, assignments and projects.
 
 ## Features
 - Modeling of satellite attitude dynamics
@@ -27,6 +27,9 @@ This package is not on PyPI but you can install it directly from the repository:
 git clone https://github.com/Jmiceli17/spacecraft_dynamics.git
 cd spacecraft_dynamics
 
+# Upgrade setuptools to support editable installs
+pip install --upgrade setuptools>=64.0
+
 # Option 1: Install directly
 pip install .
 
@@ -34,36 +37,86 @@ pip install .
 pip install -e .
 ```
 
-
-## Quick Start
-
-
 ## Documentation
 See https://github.com/Jmiceli17/spacecraft_dynamics/tree/main/docs for this package's current documentation.
 
 ## Examples
+
 See the `examples/` directory for usage examples:
 - Attitude control simulations
 - Actuator configurations
 - Orbital scenarios
-- Scripts that demonstrate how to use certain classes and utility functions (developed for various quizes and homeworks)
+- Scripts that demonstrate how to use certain classes and utility functions (developed for various quizzes and homeworks)
+
+
 ```bash
 # Example usage
 cd spacecraft_dynamics/examples
 python mission-simulation.py
 ```
-#### NOTE
-If running in WSL2, you may have to install and start [XLaunch/VcXsrv](https://sourceforge.net/projects/vcxsrv/) (or some other X-server) in order for the plots to display.
 
+> **Note:** If running in WSL2, you may need to:
+> 1. Install and start [XLaunch/VcXsrv](https://sourceforge.net/projects/vcxsrv/) (or some other X-server)
+> 2. Set the `DISPLAY` environment variable: `export DISPLAY=:0` (or `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` for WSL2)
+> 3. Ensure tkinter is available: `conda install tk` or `apt-get install python3-tk` (if using system Python)
+> 
+> The plotting code will automatically detect if a display is available and use an appropriate backend.
+
+### Example Visualizations
+
+<div align="center">
+
+#### Attitude Reference Tracking
+![Attitude and Angular Velocity](docs/images/example_attitude_tracking/example_att_tracking_att_angvel.png)
+
+![Attitude and Angular Velocity Tracking Error](docs/images/example_attitude_tracking/example_att_tracking_error.png)
+
+#### Attitude Control Simulation with VSCMG Null Motion 
+
+![Attitude and Angular Velocity](docs/images/example_vscmg/example_vscmg_nullmotion_att_angvel.png)
+
+![Wheel Speeds](docs/images/example_vscmg/example_vscmg_nullmotion_wheelspeeds.png)
+
+![Gimbal Torques](docs/images/example_vscmg/example_vscmg_nullmotion_gimbaltorques.png)
+
+![Wheel Torques](docs/images/example_vscmg/example_vscmg_nullmotion_wheeltorques.png)
+
+![Wheel Speeds](docs/images/example_vscmg/example_vscmg_nullmotion_wheelspeeds.png)
+
+</div>
+
+
+
+## Package Structure
+
+```
+spacecraft_dynamics/
+├── src/spacecraft_dynamics/
+│   ├── actuators/      # Reaction wheels, VSCMGs
+│   ├── control/        # Control algorithms
+│   ├── core/           # Core spacecraft models
+│   ├── guidance/       # Guidance algorithms
+│   ├── orbit/          # Orbital dynamics
+│   ├── state/          # State representations
+│   ├── utils/          # Utility functions
+│   └── analysis/       # Plotting and analysis tools
+├── examples/           # Example simulations
+└── docs/               # Documentation
+```
 
 ## Development
-For development, clone the repository and create a conda environment:
+
+For development, clone the repository and create a conda (recommended) environment:
 
 ```bash
 git clone https://github.com/Jmiceli17/spacecraft_dynamics.git
 cd spacecraft_dynamics
 conda env create -f environment.yml
 conda activate sc-dyn
+
+# Upgrade setuptools to support editable installs (PEP 660)
+pip install --upgrade setuptools>=64.0
+
 pip install -e .
 ```
 
