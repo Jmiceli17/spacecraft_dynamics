@@ -3,4 +3,4 @@ spacecraft_dynamics - A Python package for spacecraft attitude dynamics and cont
 """
 
 __version__ = "0.1.0"
-__all__ = ["core", "attitude", "control", "orbit", "utils", "guidance"] 
+__all__ = ["core", "actuators", "control", "orbit", "utils", "guidance", "state", "analysis"] 
